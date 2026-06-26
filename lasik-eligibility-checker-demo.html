@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LASIK Eligibility Checker Demo</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f7fb;margin:0}
+.wrap{max-width:760px;margin:40px auto;background:#fff;padding:30px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+h1{color:#0b5cab}
+.progress{height:10px;background:#ddd;border-radius:8px;overflow:hidden;margin:20px 0}
+.bar{height:100%;width:0;background:#0b5cab;transition:.3s}
+button{padding:10px 18px;background:#0b5cab;color:#fff;border:none;border-radius:6px;cursor:pointer}
+.opt{display:block;padding:8px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>LASIK Eligibility Checker</h1>
+<p>Answer a few questions to see whether you may be a suitable candidate. This is not a medical diagnosis.</p>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<div id="app"></div>
+</div>
+<script>
+const qs=[
+{q:"What is your age?",o:[["Under 18",-100],["18–21",10],["22–40",20],["41–50",15],["Above 50",10]]},
+{q:"Has your prescription been stable for at least 1 year?",o:[["Yes",20],["No",-20],["Not sure",0]]},
+{q:"Do you have diabetes?",o:[["No",10],["Controlled",5],["Uncontrolled",-20]]},
+{q:"Do you have keratoconus or severe dry eye?",o:[["No",20],["Not sure",0],["Yes",-30]]},
+{q:"Have you had previous eye surgery?",o:[["No",10],["Yes",-10]]}
+];
+let i=0,score=0,answers=[];
+const app=document.getElementById("app");
+function render(){
+document.getElementById("bar").style.width=((i)/qs.length*100)+"%";
+if(i>=qs.length){
+document.getElementById("bar").style.width="100%";
+let r="Needs Specialist Assessment";
+if(score>=60)r="Very Likely Eligible";
+else if(score>=40)r="Probably Eligible";
+app.innerHTML=`<h2>${r}</h2><p>Score: ${score}</p><p>Final eligibility can only be confirmed after a comprehensive eye examination.</p><p><button onclick="location.href='#'">Book Free Consultation</button></p>`;
+return;
+}
+let h=`<h2>Question ${i+1} of ${qs.length}</h2><p>${qs[i].q}</p>`;
+qs[i].o.forEach((x,idx)=>{h+=`<label class="opt"><input type="radio" name="a" value="${idx}"> ${x[0]}</label>`});
+h+=`<p><button onclick="next()">Next</button></p>`;
+app.innerHTML=h;
+}
+window.next=function(){
+const c=document.querySelector('input[name=a]:checked');
+if(!c){alert("Please select an option.");return;}
+score+=qs[i].o[c.value][1];
+i++;render();
+}
+render();
+</script>
+</body>
+</html>
